@@ -1,16 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Webpack Starter Kit</title>
+  <meta charset=utf-8>
+  <html lang="en" dir="ltr">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+  <title>Travel Tracker</title>
 </head>
 <body>
-  <img src="./images/turing-logo.png" alt="turing logo">
-  
-  <!-- Do not include the scripts.js or class files here - it is done by the webpack server -->
-  <script src="bundle.js"></script>
+  <header>
+    <h1 class="site-name">Travel Tracker</h1>
+    <h1 class="welcome-message" id="welcomeMessage"></h1>
+  </header>
+  <form class="trip-form" id="tripForm">
+    <input type="date" id="startDate" name="start" required>
+    <input type="number" id="duration" name="duration-days" placeholder="Duration(days)" required>
+    <input type="number" id="numOfTravelers" name="numTravelers" placeholder="Number of Travelers" required>
+    <select name="" id="" required>
+      <option value="example">Beep Beep</option>
+    </select>
+    <input type="submit">
+  </form>
+  <main class="tips-section" id="tripsSection">
+    <section class="trip-section past-trips" id="pastTrips">
 
+    </section>
+    <section class="trips-section pending-trips" id="pendingTrips">
+
+    </section>
+    <section class="trip-section upcoming-trips" id="upcomingTrips">
+
+    </section>
+  </main>
+  <script src="bundle.js"></script>
 </body>
 </html>
