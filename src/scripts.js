@@ -2,6 +2,7 @@ import './css/styles.css';
 import UserRepository from './UserRepository';
 import Destinations from './Destinations'
 import User from './User';
+
 // An example of how you tell webpack to use an image (also need to link to it in the index.html)
 import './images/turing-logo.png'
 
@@ -9,7 +10,13 @@ import './images/turing-logo.png'
 let userRepo;
 let destinations;
 let trips;
+let currentUser;
+let currentDate = '2020/06/01'
 
+//query selectors
+const pastTripSection = document.getElementById('pastTrips')
+const pendingTripsSection = document.getElementById('pendingTrips')
+const upcomingTripsSection = document.getElementById('upcomingTrips')
 //Event Listeners
 window.addEventListener('load', function(){
     resolvePromises()
@@ -24,7 +31,6 @@ function loadTravelerData(){
         }
     })
     .then((data) => {
-        console.log(data)
         return data
     })
 }
@@ -38,7 +44,6 @@ function loadDestinationData(){
         }
     })
     .then((data) => {
-        console.log(data)
         return data
     })
 }
@@ -52,7 +57,6 @@ function loadTripsData(){
         }
     })
     .then((data) => {
-        console.log(data)
         return data
     })
 }
@@ -63,28 +67,69 @@ function resolvePromises(){
     Promise.all([loadTravelerData(),loadDestinationData(), loadTripsData()])
     .then((values) => {
         userRepo = new UserRepository(values[0].travelers)
-        destinations = new Destinations(values[1])
+        destinations = new Destinations(values[1].destinations)
         trips = values[2].trips
-        assignUser(17)
-        // updateDOM()
+        assignUser(33)
+        updateDOM()
     })
 }
 
 //Data Model
 
 function assignUser(userId){
-    let currentUser = userRepo.returnSingleUser(userId)
+    currentUser = userRepo.returnSingleUser(userId)
     currentUser.filterTrips(trips)
 }
 
 //DOM 
-// function updateDOM(){
-//     showPastTrips()
-// }
 
+function updateDOM(){
+    showPastTrips()
+    showPendingTrips()
+    showUpcomingTrips()
+}
 
-// function showPastTrips(){
+function convertStringToDate(string){
+    return Date.parse(string)
+}
+
+function showPastTrips(){
+    const pastTrips = currentUser.userTrips.filter(trip => {
+       return convertStringToDate(trip.date) < convertStringToDate(currentDate) && trip.status === 'approved'
+    })
+    pastTripSection.innerHTML = pastTrips.map(trip => {
+        return `
+        <div>
+            <p>${trip.destinationID}</p>
+        </div>
+        `
+    })
+}
+
+function showPendingTrips(){
+    const pendingTrips = currentUser.userTrips.filter(trip => {
+        return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'pending'
+    })
+    pendingTripsSection.innerHTML = pendingTrips.map(trip => {
+        return `
+        <div>
+            <p>${trip.destinationID}</p>
+        </div>
+        `
+    })
+}
+
+function showUpcomingTrips(){
+    const upcomingTrips = currentUser.userTrips.filter(trip => {
+        return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'approved'
+    })
+    upcomingTripsSection.innerHTML = upcomingTrips.map(trip => {
+        return `
+        <div>
+            <p>${trip.destinationID}</p>
+        </div>
+        `
+    })
     
-// }
-
+}
 
