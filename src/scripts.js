@@ -64,8 +64,8 @@ function resolvePromises(){
     .then((values) => {
         userRepo = new UserRepository(values[0].travelers)
         destinations = new Destinations(values[1])
-        trips = values[2]
-        assignUser(1)
+        trips = values[2].trips
+        assignUser(17)
         // updateDOM()
     })
 }
@@ -74,7 +74,7 @@ function resolvePromises(){
 
 function assignUser(userId){
     let currentUser = userRepo.returnSingleUser(userId)
-    currentUser.filterTrips()
+    currentUser.filterTrips(trips)
 }
 
 //DOM 
