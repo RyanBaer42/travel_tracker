@@ -10,29 +10,31 @@
   <title>Travel Tracker</title>
 </head>
 <body>
-  <header>
+  <header class="top-header">
     <h1 class="site-name">Travel Tracker</h1>
     <h1 class="welcome-message" id="welcomeMessage"></h1>
   </header>
-  <form class="trip-form" id="tripForm">
-    <input type="date" id="startDate" name="start" required>
-    <input type="number" id="duration" name="duration-days" placeholder="Duration(days)" required>
-    <input type="number" id="numOfTravelers" name="numTravelers" placeholder="Number of Travelers" required>
-    <select name="" id="" required>
-      <option value="example">Beep Beep</option>
-    </select>
-    <input type="submit">
-  </form>
-  <main class="tips-section" id="tripsSection">
-    <section class="trip-section past-trips" id="pastTrips">
-
-    </section>
-    <section class="trips-section pending-trips" id="pendingTrips">
-
-    </section>
-    <section class="trip-section upcoming-trips" id="upcomingTrips">
-
-    </section>
+  <main class="trips-section-main" id="tripsSection">
+    <form class="trip-form" id="tripForm">
+      <input type="date" id="startDate" name="start" required>
+      <input type="number" id="duration" name="duration-days" placeholder="Duration(days)" required>
+      <input type="number" id="numOfTravelers" name="numTravelers" placeholder="Number of Travelers" required>
+      <select name="" id="" required>
+        <option value="example">Beep Beep</option>
+      </select>
+      <input type="submit">
+    </form>
+    <div class="trips-display-section">
+      <section class="trip-section past-trips" id="pastTrips">
+        <h1>Past Trips</h1>
+      </section>
+      <section class="trip-section pending-trips" id="pendingTrips">
+        <h1>Pending Trips</h1>
+      </section>
+      <section class="trip-section upcoming-trips" id="upcomingTrips">
+        <h1>Upcoming Trips</h1>
+      </section>
+    </div>
   </main>
   <script src="bundle.js"></script>
 </body>
