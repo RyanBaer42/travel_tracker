@@ -17,6 +17,7 @@ let currentDate = '2020/06/01'
 const pastTripSection = document.getElementById('pastTrips')
 const pendingTripsSection = document.getElementById('pendingTrips')
 const upcomingTripsSection = document.getElementById('upcomingTrips')
+const welcomeMessage = document.getElementById('welcomeMessage')
 //Event Listeners
 window.addEventListener('load', function(){
     resolvePromises()
@@ -87,6 +88,7 @@ function updateDOM(){
     showPastTrips()
     showPendingTrips()
     showUpcomingTrips()
+    displayWelcomeMessage()
 }
 
 function convertStringToDate(string){
@@ -96,11 +98,17 @@ function convertStringToDate(string){
 function showPastTrips(){
     const pastTrips = currentUser.userTrips.filter(trip => {
        return convertStringToDate(trip.date) < convertStringToDate(currentDate) && trip.status === 'approved'
+    }).map(trip => {
+        return {
+            destination: destinations.findById(trip.destinationID).destination,
+            image: destinations.findById(trip.destinationID).image,
+        }
     })
-    pastTripSection.innerHTML = pastTrips.map(trip => {
+    pastTripSection.innerHTML += pastTrips.map(trip => {
         return `
-        <div>
-            <p>${trip.destinationID}</p>
+        <div class="single-trip">
+            <img class="trip-image" src="${trip.image}">
+            <p>${trip.destination}</p>
         </div>
         `
     })
@@ -109,11 +117,17 @@ function showPastTrips(){
 function showPendingTrips(){
     const pendingTrips = currentUser.userTrips.filter(trip => {
         return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'pending'
+    }).map(trip => {
+        return {
+            destination: destinations.findById(trip.destinationID).destination,
+            image: destinations.findById(trip.destinationID).image,
+        }
     })
-    pendingTripsSection.innerHTML = pendingTrips.map(trip => {
+    pendingTripsSection.innerHTML += pendingTrips.map(trip => {
         return `
-        <div>
-            <p>${trip.destinationID}</p>
+        <div class="single-trip">
+            <img class="trip-image" src="${trip.image}">
+            <p>${trip.destination}</p>
         </div>
         `
     })
@@ -122,14 +136,23 @@ function showPendingTrips(){
 function showUpcomingTrips(){
     const upcomingTrips = currentUser.userTrips.filter(trip => {
         return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'approved'
+    }).map(trip => {
+        return {
+            destination: destinations.findById(trip.destinationID).destination,
+            image: destinations.findById(trip.destinationID).image,
+        }
     })
-    upcomingTripsSection.innerHTML = upcomingTrips.map(trip => {
+    upcomingTripsSection.innerHTML += upcomingTrips.map(trip => {
         return `
-        <div>
-            <p>${trip.destinationID}</p>
+        <div class="single-trip">
+            <img class="trip-image" src="${trip.image}">
+            <p>${trip.destination}</p>
         </div>
         `
     })
-    
+}
+
+function displayWelcomeMessage(){
+    welcomeMessage.innerText = `Welcome ${currentUser.returnFirstName()}!`
 }
 
