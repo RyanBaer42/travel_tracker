@@ -11,13 +11,14 @@ let userRepo;
 let destinations;
 let trips;
 let currentUser;
-let currentDate = '2020/06/01'
+let currentDate = '2020/12/01'
 
 //query selectors
 const pastTripSection = document.getElementById('pastTrips')
 const pendingTripsSection = document.getElementById('pendingTrips')
 const upcomingTripsSection = document.getElementById('upcomingTrips')
 const welcomeMessage = document.getElementById('welcomeMessage')
+const yearsTotalCost = document.getElementById('tripsTotalCost')
 //Event Listeners
 window.addEventListener('load', function(){
     resolvePromises()
@@ -70,7 +71,7 @@ function resolvePromises(){
         userRepo = new UserRepository(values[0].travelers)
         destinations = new Destinations(values[1].destinations)
         trips = values[2].trips
-        assignUser(33)
+        assignUser(21)
         updateDOM()
     })
 }
@@ -89,6 +90,8 @@ function updateDOM(){
     showPendingTrips()
     showUpcomingTrips()
     displayWelcomeMessage()
+    displayYearCosts()
+    // addDestinationOptions()
 }
 
 function convertStringToDate(string){
@@ -156,3 +159,13 @@ function displayWelcomeMessage(){
     welcomeMessage.innerText = `Welcome ${currentUser.returnFirstName()}!`
 }
 
+function displayYearCosts(){
+    const lastYear = new Date(new Date(currentDate) - 365 * 24 * 60 * 60 * 1000)
+    const lastYearCosts = currentUser.userTrips.filter(trip => {
+        return (convertStringToDate(trip.date) < convertStringToDate(currentDate)) && (convertStringToDate(trip.date) > convertStringToDate(lastYear)) && (trip.status === 'approved')
+    }).reduce((acc, trip)=> {
+        acc += destinations.calculateCosts(trip.destinationID, trip.travelers, trip.duration)
+        return acc
+    }, 0)
+    tripsTotalCost.innerText = `Total Spent This Year: $${lastYearCosts}`
+}

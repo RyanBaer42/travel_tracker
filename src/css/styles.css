@@ -60,6 +60,11 @@ body{
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-y: scroll
+}
+
+.trip-section::-webkit-scrollbar {
+    display: none; 
 }
 
 .single-trip {
