@@ -24,6 +24,7 @@ const startDate = document.getElementById('startDate')
 const tripDuration = document.getElementById('duration')
 const numOfTravelers = document.getElementById('numOfTravelers')
 const destinationOptions = document.getElementById('destinationOptions')
+const singleTripCost = document.getElementById('singleTripCost')
 //Event Listeners
 window.addEventListener('load', function(){
     resolvePromises()
@@ -94,17 +95,18 @@ function assignUser(userId){
 
 function postNewTrip(event){
     event.preventDefault()
+    let newTrip = {
+        id: trips.length + 1,
+        userID: currentUser.id,
+        destinationID: destinations.findByName(destinationOptions.value).id,
+        travelers: numOfTravelers.valueAsNumber,
+        date: startDate.value.split('-').join('/'),
+        duration: tripDuration.valueAsNumber,
+        status: 'pending',
+        suggestedActivities: []}
     fetch('http://localhost:3001/api/v1/trips', {
         method: 'POST',
-        body: JSON.stringify({
-            id: trips.length + 1,
-            userID: currentUser.id,
-            destinationID: destinations.findByName(destinationOptions.value).id,
-            travelers: numOfTravelers.valueAsNumber,
-            date: startDate.value.split('-').join('/'),
-            duration: tripDuration.valueAsNumber,
-            status: 'pending',
-            suggestedActivities: []}), 
+        body: JSON.stringify(newTrip), 
         headers: {
             'Content-Type': 'application/json'
         }
@@ -114,6 +116,7 @@ function postNewTrip(event){
           throw new Error("Data failed to post");
         }
         resolvePromises()
+        displayNewTripCost(newTrip)
         return response.json();
       })
 }
@@ -214,3 +217,7 @@ function addDestinationOptions(){
     })
 }
 
+function displayNewTripCost(newTripInfo){
+    let newTripCost = destinations.calculateCosts(newTripInfo.destinationID, newTripInfo.travelers, newTripInfo.duration)
+    singleTripCost.innerText = `Your new trip to ${destinations.findById(newTripInfo.destinationID).destination} will cost $${newTripCost}.`
+}
