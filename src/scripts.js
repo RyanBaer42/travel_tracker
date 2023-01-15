@@ -14,16 +14,23 @@ let currentUser;
 let currentDate = '2020/12/01'
 
 //query selectors
-const pastTripSection = document.getElementById('pastTrips')
-const pendingTripsSection = document.getElementById('pendingTrips')
-const upcomingTripsSection = document.getElementById('upcomingTrips')
+const pastTripSection = document.getElementById('tripsPerSectionPast')
+const pendingTripsSection = document.getElementById('tripsPerSectionPending')
+const upcomingTripsSection = document.getElementById('tripsPerSectionUpcoming')
 const welcomeMessage = document.getElementById('welcomeMessage')
 const yearsTotalCost = document.getElementById('tripsTotalCost')
+const tripSubmitButton = document.getElementById('tripSubmitButton')
+const startDate = document.getElementById('startDate')
+const tripDuration = document.getElementById('duration')
+const numOfTravelers = document.getElementById('numOfTravelers')
 const destinationOptions = document.getElementById('destinationOptions')
 //Event Listeners
 window.addEventListener('load', function(){
     resolvePromises()
 })
+tripSubmitButton.addEventListener('click', postNewTrip)
+
+
 // API Calls GET Requests
 function loadTravelerData(){
     const travelersURL = 'http://localhost:3001/api/v1/travelers'
@@ -85,6 +92,31 @@ function assignUser(userId){
     currentUser.filterTrips(trips)
 }
 
+function postNewTrip(event){
+    event.preventDefault()
+    fetch('http://localhost:3001/api/v1/trips', {
+        method: 'POST',
+        body: JSON.stringify({
+            id: trips.length + 1,
+            userID: currentUser.id,
+            destinationID: destinations.findByName(destinationOptions.value).id,
+            travelers: numOfTravelers.valueAsNumber,
+            date: startDate.value.split('-').join('/'),
+            duration: tripDuration.valueAsNumber,
+            status: 'pending',
+            suggestedActivities: []}), 
+        headers: {
+            'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if(!response.ok) {
+          throw new Error("Data failed to post");
+        }
+        resolvePromises()
+        return response.json();
+      })
+}
 //DOM 
 
 function updateDOM(){
@@ -108,6 +140,7 @@ function showPastTrips(){
             image: destinations.findById(trip.destinationID).image,
         }
     })
+    pastTripSection.innerHTML = " "
     pastTripSection.innerHTML += pastTrips.map(trip => {
         return `
         <div class="single-trip">
@@ -127,6 +160,7 @@ function showPendingTrips(){
             image: destinations.findById(trip.destinationID).image,
         }
     })
+    pendingTripsSection.innerHTML = " "
     pendingTripsSection.innerHTML += pendingTrips.map(trip => {
         return `
         <div class="single-trip">
@@ -146,6 +180,7 @@ function showUpcomingTrips(){
             image: destinations.findById(trip.destinationID).image,
         }
     })
+    upcomingTripsSection.innerHTML = " "
     upcomingTripsSection.innerHTML += upcomingTrips.map(trip => {
         return `
         <div class="single-trip">
@@ -168,7 +203,7 @@ function displayYearCosts(){
         acc += destinations.calculateCosts(trip.destinationID, trip.travelers, trip.duration)
         return acc
     }, 0)
-    yearsTotalCost.innerText = `Total Spent This Year: $${lastYearCosts}`
+    yearsTotalCost.innerText = `Total Spent This Past Year: $${lastYearCosts}`
 }
 
 function addDestinationOptions(){

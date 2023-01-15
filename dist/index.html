@@ -16,23 +16,29 @@
   </header>
   <main class="trips-section-main" id="tripsSection">
     <form class="trip-form" id="tripForm">
-      <input type="date" id="startDate" name="start" required>
-      <input type="number" id="duration" name="duration-days" placeholder="Duration(days)" required>
-      <input type="number" id="numOfTravelers" name="numTravelers" placeholder="Number of Travelers" required>
+      <input type="date" id="startDate" name="start" min="2020-12-02" value="2020-12-02" required>
+      <input type="number" id="duration" name="duration-days" placeholder="Duration(days)" min="1" required>
+      <input type="number" id="numOfTravelers" name="numTravelers" placeholder="Number of Travelers" min="1" required>
       <select name="" id="destinationOptions" required>
       </select>
-      <input type="submit">
+      <input id="tripSubmitButton" type="submit">
     </form>
     <p class="trips-total-cost" id="tripsTotalCost"></p>
     <div class="trips-display-section">
       <section class="trip-section past-trips" id="pastTrips">
         <h1>Past Trips</h1>
+        <div class="trips-per-section-past" id="tripsPerSectionPast">
+        </div>
       </section>
       <section class="trip-section pending-trips" id="pendingTrips">
         <h1>Pending Trips</h1>
+        <div class="trips-per-section-pending" id="tripsPerSectionPending">
+        </div>
       </section>
       <section class="trip-section upcoming-trips" id="upcomingTrips">
         <h1>Upcoming Trips</h1>
+        <div class="trips-per-section-upcoming" id="tripsPerSectionUpcoming">
+        </div>
       </section>
     </div>
   </main>
