@@ -19,6 +19,7 @@ const pendingTripsSection = document.getElementById('pendingTrips')
 const upcomingTripsSection = document.getElementById('upcomingTrips')
 const welcomeMessage = document.getElementById('welcomeMessage')
 const yearsTotalCost = document.getElementById('tripsTotalCost')
+const destinationOptions = document.getElementById('destinationOptions')
 //Event Listeners
 window.addEventListener('load', function(){
     resolvePromises()
@@ -73,6 +74,7 @@ function resolvePromises(){
         trips = values[2].trips
         assignUser(21)
         updateDOM()
+        addDestinationOptions()
     })
 }
 
@@ -91,7 +93,6 @@ function updateDOM(){
     showUpcomingTrips()
     displayWelcomeMessage()
     displayYearCosts()
-    // addDestinationOptions()
 }
 
 function convertStringToDate(string){
@@ -167,5 +168,14 @@ function displayYearCosts(){
         acc += destinations.calculateCosts(trip.destinationID, trip.travelers, trip.duration)
         return acc
     }, 0)
-    tripsTotalCost.innerText = `Total Spent This Year: $${lastYearCosts}`
+    yearsTotalCost.innerText = `Total Spent This Year: $${lastYearCosts}`
 }
+
+function addDestinationOptions(){
+    destinationOptions.innerHTML += destinations.data.map(destination => {
+        return `
+        <option>${destination.destination}</option>
+        `
+    })
+}
+
