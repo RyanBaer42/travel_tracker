@@ -25,11 +25,17 @@ const tripDuration = document.getElementById('duration')
 const numOfTravelers = document.getElementById('numOfTravelers')
 const destinationOptions = document.getElementById('destinationOptions')
 const singleTripCost = document.getElementById('singleTripCost')
+const signInButton = document.getElementById('signInButton')
+const wrongInputError = document.getElementById('wrongInputError')
+const loginSection = document.getElementById('loginSection')
+const topHeader = document.getElementById('topHeader')
+const tripsSection = document.getElementById('tripsSection')
 //Event Listeners
-window.addEventListener('load', function(){
-    resolvePromises()
-})
+// window.addEventListener('load', function(){
+//     resolvePromises()
+// })
 tripSubmitButton.addEventListener('click', postNewTrip)
+signInButton.addEventListener('click', evaluateInformation)
 
 
 // API Calls GET Requests
@@ -74,13 +80,13 @@ function loadTripsData(){
 
 
 //Promises
-function resolvePromises(){
+function resolvePromises(userId){
     Promise.all([loadTravelerData(),loadDestinationData(), loadTripsData()])
     .then((values) => {
         userRepo = new UserRepository(values[0].travelers)
         destinations = new Destinations(values[1].destinations)
         trips = values[2].trips
-        assignUser(44)
+        assignUser(userId)
         updateDOM()
         addDestinationOptions()
     })
@@ -115,10 +121,45 @@ function postNewTrip(event){
         if(!response.ok) {
           throw new Error("Data failed to post");
         }
-        resolvePromises()
+        resolvePromises(currentUser.id)
         displayNewTripCost(newTrip)
         return response.json();
       })
+}
+
+function evaluateInformation(){
+    let userIdInput = username.value.split("r")[2]
+    let userId = parseInt(userIdInput)
+    let userTraveler = username.value.slice(0,8)
+    let passwordInput = pass.value
+    if(userTraveler === "traveler" && passwordInput === "travel" && userId <= 50 && userId){
+      resolvePromises(userId)
+      hideLogInPage()
+    } else if (userTraveler !== "traveler" && passwordInput !== "travel"){
+      invalidUsernameAndPassword()
+    } else if (userTraveler !== "traveler" || userId > 50 || !userId){
+      invalidUsername()
+    } else if (passwordInput !== "travel") {
+      invalidPassword()
+    }
+}
+
+function invalidUsernameAndPassword(){
+    wrongInputError.innerText = "Invalid username and password"
+}
+  
+function invalidUsername(){
+    wrongInputError.innerText = "Invalid username"
+}
+  
+function invalidPassword(){
+    wrongInputError.innerText = "Invalid password"
+}
+
+function hideLogInPage(){
+    loginSection.classList.add('hidden')
+    topHeader.classList.remove('hidden')
+    tripsSection.classList.remove('hidden')
 }
 //DOM 
 
