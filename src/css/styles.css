@@ -47,14 +47,7 @@ body{
     justify-content: center;
     width: 100%;
     height: 60vh;
-}
-
-.past-trips {
-    margin-right: 1vw;
-}
-
-.pending-trips {
-    margin-right: 1vw;
+    gap: 1vw;
 }
 
 .trip-section {
@@ -143,5 +136,9 @@ body{
 
 .password-input {
     margin-bottom: 1vh;
+}
+
+.password {
+    margin-left: 4px;
 }
 
