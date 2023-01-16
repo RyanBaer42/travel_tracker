@@ -78,12 +78,14 @@ body{
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 1vh;
 }
 
 .trip-image {
     height: 20vh;
     width: 15vw;
-    border-radius: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 .trip-form {
@@ -98,10 +100,6 @@ body{
 .input-label {
     font-size:small;
 }
-
-.trip-submit-button {
-    height: 2vh;
-} 
 
 .submit-form {
     display: flex;
@@ -121,7 +119,7 @@ body{
     align-items: center;
 }
 
-.login-inputs {
+.login-section{
     height: 300px;
     width: 300px;
     display: flex;
@@ -132,4 +130,18 @@ body{
     padding: 80px;
 }
 
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.username-input {
+    margin-bottom: 1vh;
+    margin-top: 2vh;
+}
+
+.password-input {
+    margin-bottom: 1vh;
+}
 
