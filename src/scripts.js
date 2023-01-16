@@ -19,23 +19,23 @@ const pendingTripsSection = document.getElementById('tripsPerSectionPending')
 const upcomingTripsSection = document.getElementById('tripsPerSectionUpcoming')
 const welcomeMessage = document.getElementById('welcomeMessage')
 const yearsTotalCost = document.getElementById('tripsTotalCost')
-const tripSubmitButton = document.getElementById('tripSubmitButton')
 const startDate = document.getElementById('start')
 const tripDuration = document.getElementById('duration')
 const numOfTravelers = document.getElementById('numOfTravelers')
 const destinationOptions = document.getElementById('destinationOptions')
 const singleTripCost = document.getElementById('singleTripCost')
-const signInButton = document.getElementById('signInButton')
 const wrongInputError = document.getElementById('wrongInputError')
 const loginSection = document.getElementById('loginSection')
 const topHeader = document.getElementById('topHeader')
 const tripsSection = document.getElementById('tripsSection')
+const tripForm = document.getElementById('tripForm')
+const loginForm = document.getElementById('loginForm')
 //Event Listeners
 // window.addEventListener('load', function(){
 //     resolvePromises()
 // })
-tripSubmitButton.addEventListener('click', postNewTrip)
-signInButton.addEventListener('click', evaluateInformation)
+tripForm.addEventListener('submit', postNewTrip)
+loginForm.addEventListener('submit', evaluateInformation)
 
 
 // API Calls GET Requests
@@ -127,7 +127,8 @@ function postNewTrip(event){
       })
 }
 
-function evaluateInformation(){
+function evaluateInformation(event){
+    event.preventDefault()
     let userIdInput = username.value.split("r")[2]
     let userId = parseInt(userIdInput)
     let userTraveler = username.value.slice(0,8)
@@ -186,8 +187,8 @@ function showPastTrips(){
         }
     })
     pastTripSection.innerHTML = " "
-    pastTripSection.innerHTML += pastTrips.map(trip => {
-        return `
+    pastTrips.forEach(trip => {
+        pastTripSection.innerHTML +=  `
         <div tabindex="0" class="single-trip">
             <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
             <p>${trip.destination}</p>
@@ -207,8 +208,8 @@ function showPendingTrips(){
         }
     })
     pendingTripsSection.innerHTML = " "
-    pendingTripsSection.innerHTML += pendingTrips.map(trip => {
-        return `
+    pendingTrips.forEach(trip => {
+        pendingTripsSection.innerHTML += `
         <div tabindex="0" class="single-trip">
             <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
             <p>${trip.destination}</p>
@@ -228,8 +229,8 @@ function showUpcomingTrips(){
         }
     })
     upcomingTripsSection.innerHTML = " "
-    upcomingTripsSection.innerHTML += upcomingTrips.map(trip => {
-        return `
+    upcomingTrips.forEach(trip => {
+        upcomingTripsSection.innerHTML += `
         <div tabindex="0" class="single-trip">
             <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
             <p>${trip.destination}</p>
