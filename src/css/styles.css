@@ -81,5 +81,29 @@ body{
     border-radius: 5px;
 }
 
+.trip-form {
+    display: flex;
+    justify-content: center;
+}
+.label-and-input {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-label {
+    font-size:small;
+}
+
+.trip-submit-button {
+    height: 2vh;
+} 
+
+.submit-form {
+    display: flex;
+    align-items: flex-end;
+    box-sizing: border-box
+}
+
+
 
 
