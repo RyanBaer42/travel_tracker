@@ -3,18 +3,28 @@
 <head>
   <meta charset=utf-8>
   <html lang="en" dir="ltr">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" src="src/css/styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
   <title>Travel Tracker</title>
 </head>
 <body>
-  <header class="top-header">
+  <section class="login-section" id="loginSection">
+    <div class="login-inputs">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username">
+      <label for="pass">Password:<label>
+      <input type="password" id="pass" name="password" class="password"required>
+      <input type="submit" value="Sign in" id="signInButton">
+      <p id="wrongInputError"></p>
+    </div>
+  </section>
+  <header class="top-header hidden" id="topHeader">
     <h1 tabindex="0" class="site-name">Travel Tracker</h1>
     <h1 tabindex="0" class="welcome-message" id="welcomeMessage"></h1>
   </header>
-  <main class="trips-section-main" id="tripsSection">
+  <main class="trips-section-main hidden" id="tripsSection">
     <form class="trip-form" id="tripForm">
       <div class="label-and-input">
         <label class="input-label" for="start">Start Date</label>
