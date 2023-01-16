@@ -1,10 +1,7 @@
 import './css/styles.css';
 import UserRepository from './UserRepository';
 import Destinations from './Destinations'
-import User from './User';
-
-// An example of how you tell webpack to use an image (also need to link to it in the index.html)
-import './images/turing-logo.png'
+import apiCalls from './apiCalls';
 
 //Global Variables
 let userRepo;
@@ -30,58 +27,16 @@ const topHeader = document.getElementById('topHeader')
 const tripsSection = document.getElementById('tripsSection')
 const tripForm = document.getElementById('tripForm')
 const loginForm = document.getElementById('loginForm')
-//Event Listeners
-// window.addEventListener('load', function(){
-//     resolvePromises()
-// })
-tripForm.addEventListener('submit', postNewTrip)
+
+tripForm.addEventListener('submit', function(event){
+    event.preventDefault()
+    saveNewTrip()
+})
 loginForm.addEventListener('submit', evaluateInformation)
-
-
-// API Calls GET Requests
-function loadTravelerData(){
-    const travelersURL = 'http://localhost:3001/api/v1/travelers'
-    return fetch(travelersURL)
-    .then((response) => {
-        if (response.ok){
-                return response.json()
-        }
-    })
-    .then((data) => {
-        return data
-    })
-}
-
-function loadDestinationData(){
-    const destinationURL = 'http://localhost:3001/api/v1/destinations'
-    return fetch(destinationURL)
-    .then((response) => {
-        if (response.ok){
-                return response.json()
-        }
-    })
-    .then((data) => {
-        return data
-    })
-}
-
-function loadTripsData(){
-    const tripsURL = 'http://localhost:3001/api/v1/trips'
-    return fetch(tripsURL)
-    .then((response) => {
-        if (response.ok){
-                return response.json()
-        }
-    })
-    .then((data) => {
-        return data
-    })
-}
-
 
 //Promises
 function resolvePromises(userId){
-    Promise.all([loadTravelerData(),loadDestinationData(), loadTripsData()])
+    Promise.all([apiCalls.loadGetData('http://localhost:3001/api/v1/travelers'),apiCalls.loadGetData('http://localhost:3001/api/v1/destinations'), apiCalls.loadGetData('http://localhost:3001/api/v1/trips')])
     .then((values) => {
         userRepo = new UserRepository(values[0].travelers)
         destinations = new Destinations(values[1].destinations)
@@ -165,9 +120,9 @@ function hideLogInPage(){
 //DOM 
 
 function updateDOM(){
-    showPastTrips()
-    showPendingTrips()
-    showUpcomingTrips()
+    findPastTrips()
+    findPendingTrips()
+    findUpcomingTrips()
     displayWelcomeMessage()
     displayYearCosts()
 }
@@ -176,7 +131,7 @@ function convertStringToDate(string){
     return Date.parse(string)
 }
 
-function showPastTrips(){
+function findPastTrips(){
     const pastTrips = currentUser.userTrips.filter(trip => {
        return convertStringToDate(trip.date) < convertStringToDate(currentDate) && trip.status === 'approved'
     }).map(trip => {
@@ -186,18 +141,10 @@ function showPastTrips(){
             alt: destinations.findById(trip.destinationID).alt,
         }
     })
-    pastTripSection.innerHTML = " "
-    pastTrips.forEach(trip => {
-        pastTripSection.innerHTML +=  `
-        <div tabindex="0" class="single-trip">
-            <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
-            <p>${trip.destination}</p>
-        </div>
-        `
-    })
+    showTrips(pastTrips, pastTripSection)
 }
 
-function showPendingTrips(){
+function findPendingTrips(){
     const pendingTrips = currentUser.userTrips.filter(trip => {
         return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'pending'
     }).map(trip => {
@@ -207,18 +154,10 @@ function showPendingTrips(){
             alt: destinations.findById(trip.destinationID).alt,
         }
     })
-    pendingTripsSection.innerHTML = " "
-    pendingTrips.forEach(trip => {
-        pendingTripsSection.innerHTML += `
-        <div tabindex="0" class="single-trip">
-            <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
-            <p>${trip.destination}</p>
-        </div>
-        `
-    })
+    showTrips(pendingTrips, pendingTripsSection)
 }
 
-function showUpcomingTrips(){
+function findUpcomingTrips(){
     const upcomingTrips = currentUser.userTrips.filter(trip => {
         return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'approved'
     }).map(trip => {
@@ -228,15 +167,7 @@ function showUpcomingTrips(){
             alt: destinations.findById(trip.destinationID).alt,
         }
     })
-    upcomingTripsSection.innerHTML = " "
-    upcomingTrips.forEach(trip => {
-        upcomingTripsSection.innerHTML += `
-        <div tabindex="0" class="single-trip">
-            <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
-            <p>${trip.destination}</p>
-        </div>
-        `
-    })
+    showTrips(upcomingTrips, upcomingTripsSection)
 }
 
 function displayWelcomeMessage(){
@@ -265,4 +196,38 @@ function addDestinationOptions(){
 function displayNewTripCost(newTripInfo){
     let newTripCost = destinations.calculateCosts(newTripInfo.destinationID, newTripInfo.travelers, newTripInfo.duration)
     singleTripCost.innerText = `Your new trip to ${destinations.findById(newTripInfo.destinationID).destination} will cost $${newTripCost}.`
+}
+
+
+function showTrips(filteredTrips, tripLocation){
+    tripLocation.innerHTML = " "
+    filteredTrips.forEach(trip => {
+        tripLocation.innerHTML +=  `
+        <div tabindex="0" class="single-trip">
+            <img class="trip-image" src="${trip.image}" alt="${trip.alt || trip.destination}">
+            <p>${trip.destination}</p>
+        </div>
+        `
+    })
+}
+
+function saveNewTrip(){
+    let newTrip = {
+        id: trips.length + 1,
+        userID: currentUser.id,
+        destinationID: destinations.findByName(destinationOptions.value).id,
+        travelers: numOfTravelers.valueAsNumber,
+        date: startDate.value.split('-').join('/'),
+        duration: tripDuration.valueAsNumber,
+        status: 'pending',
+        suggestedActivities: [],}
+    apiCalls.postNewTrip(newTrip)
+    .then(response => {
+        if(!response.ok) {
+          throw new Error("Data failed to post");
+        }
+        resolvePromises(currentUser.id)
+        displayNewTripCost(newTrip)
+        return response.json();
+      })
 }
