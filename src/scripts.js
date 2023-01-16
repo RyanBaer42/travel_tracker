@@ -20,7 +20,7 @@ const upcomingTripsSection = document.getElementById('tripsPerSectionUpcoming')
 const welcomeMessage = document.getElementById('welcomeMessage')
 const yearsTotalCost = document.getElementById('tripsTotalCost')
 const tripSubmitButton = document.getElementById('tripSubmitButton')
-const startDate = document.getElementById('startDate')
+const startDate = document.getElementById('start')
 const tripDuration = document.getElementById('duration')
 const numOfTravelers = document.getElementById('numOfTravelers')
 const destinationOptions = document.getElementById('destinationOptions')
@@ -80,7 +80,7 @@ function resolvePromises(){
         userRepo = new UserRepository(values[0].travelers)
         destinations = new Destinations(values[1].destinations)
         trips = values[2].trips
-        assignUser(21)
+        assignUser(44)
         updateDOM()
         addDestinationOptions()
     })
@@ -103,7 +103,7 @@ function postNewTrip(event){
         date: startDate.value.split('-').join('/'),
         duration: tripDuration.valueAsNumber,
         status: 'pending',
-        suggestedActivities: []}
+        suggestedActivities: [],}
     fetch('http://localhost:3001/api/v1/trips', {
         method: 'POST',
         body: JSON.stringify(newTrip), 
@@ -141,13 +141,14 @@ function showPastTrips(){
         return {
             destination: destinations.findById(trip.destinationID).destination,
             image: destinations.findById(trip.destinationID).image,
+            alt: destinations.findById(trip.destinationID).alt,
         }
     })
     pastTripSection.innerHTML = " "
     pastTripSection.innerHTML += pastTrips.map(trip => {
         return `
-        <div class="single-trip">
-            <img class="trip-image" src="${trip.image}">
+        <div tabindex="0" class="single-trip">
+            <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
             <p>${trip.destination}</p>
         </div>
         `
@@ -161,13 +162,14 @@ function showPendingTrips(){
         return {
             destination: destinations.findById(trip.destinationID).destination,
             image: destinations.findById(trip.destinationID).image,
+            alt: destinations.findById(trip.destinationID).alt,
         }
     })
     pendingTripsSection.innerHTML = " "
     pendingTripsSection.innerHTML += pendingTrips.map(trip => {
         return `
-        <div class="single-trip">
-            <img class="trip-image" src="${trip.image}">
+        <div tabindex="0" class="single-trip">
+            <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
             <p>${trip.destination}</p>
         </div>
         `
@@ -181,13 +183,14 @@ function showUpcomingTrips(){
         return {
             destination: destinations.findById(trip.destinationID).destination,
             image: destinations.findById(trip.destinationID).image,
+            alt: destinations.findById(trip.destinationID).alt,
         }
     })
     upcomingTripsSection.innerHTML = " "
     upcomingTripsSection.innerHTML += upcomingTrips.map(trip => {
         return `
-        <div class="single-trip">
-            <img class="trip-image" src="${trip.image}">
+        <div tabindex="0" class="single-trip">
+            <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
             <p>${trip.destination}</p>
         </div>
         `
