@@ -11,32 +11,46 @@
 </head>
 <body>
   <header class="top-header">
-    <h1 class="site-name">Travel Tracker</h1>
-    <h1 class="welcome-message" id="welcomeMessage"></h1>
+    <h1 tabindex="0" class="site-name">Travel Tracker</h1>
+    <h1 tabindex="0" class="welcome-message" id="welcomeMessage"></h1>
   </header>
   <main class="trips-section-main" id="tripsSection">
     <form class="trip-form" id="tripForm">
-      <input type="date" id="startDate" name="start" min="2020-12-02" value="2020-12-02" required>
-      <input type="number" id="duration" name="duration-days" placeholder="Duration(days)" min="1" required>
-      <input type="number" id="numOfTravelers" name="numTravelers" placeholder="Number of Travelers" min="1" required>
-      <select name="" id="destinationOptions" required>
-      </select>
-      <input id="tripSubmitButton" type="submit">
+      <div class="label-and-input">
+        <label class="input-label" for="start">Start Date</label>
+        <input class="selection-box" type="date" id="start" name="startDate" min="2020-12-02" value="2020-12-02" required>
+      </div>
+      <div class="label-and-input">
+        <label class="input-label" for="duration">Duration</label>
+        <input class="selection-box" type="number" id="duration" name="duration-days" placeholder="Duration(days)" min="1" required>
+      </div>
+      <div class="label-and-input">
+        <label class="input-label" for="numOfTravelers">Number of Travelers</label>
+        <input class="selection-box" type="number" id="numOfTravelers" name="numTravelers" placeholder="Number of Travelers" min="1" required>
+      </div>
+      <div class="label-and-input">
+        <label class="input-label" for="destinationOptions">Destinations</label>
+        <select class="selection-box" name="destinationDropdown" id="destinationOptions" required>
+        </select>
+      </div>
+      <div class="submit-form">
+        <input class="trip-submit-button" id="tripSubmitButton" type="submit" value="submit">
+      </div>
     </form>
-    <p class="trips-total-cost" id="tripsTotalCost"></p>
-    <p class="single-trip-cost" id="singleTripCost"></p>
+    <p tabindex="0" class="trips-total-cost" id="tripsTotalCost"></p>
+    <p tabindex="0" class="single-trip-cost" id="singleTripCost"></p>
     <div class="trips-display-section">
-      <section class="trip-section past-trips" id="pastTrips">
+      <section tabindex="0" class="trip-section past-trips" id="pastTrips">
         <h1>Past Trips</h1>
         <div class="trips-per-section-past" id="tripsPerSectionPast">
         </div>
       </section>
-      <section class="trip-section pending-trips" id="pendingTrips">
+      <section tabindex="0" class="trip-section pending-trips" id="pendingTrips">
         <h1>Pending Trips</h1>
         <div class="trips-per-section-pending" id="tripsPerSectionPending">
         </div>
       </section>
-      <section class="trip-section upcoming-trips" id="upcomingTrips">
+      <section tabindex="0" class="trip-section upcoming-trips" id="upcomingTrips">
         <h1>Upcoming Trips</h1>
         <div class="trips-per-section-upcoming" id="tripsPerSectionUpcoming">
         </div>
