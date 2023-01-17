@@ -2,6 +2,7 @@ import './css/styles.css';
 import UserRepository from './UserRepository';
 import Destinations from './Destinations'
 import apiCalls from './apiCalls';
+import domUpdates from './domUpdates';
 
 //Global Variables
 let userRepo;
@@ -54,34 +55,6 @@ function assignUser(userId){
     currentUser.filterTrips(trips)
 }
 
-function postNewTrip(event){
-    event.preventDefault()
-    let newTrip = {
-        id: trips.length + 1,
-        userID: currentUser.id,
-        destinationID: destinations.findByName(destinationOptions.value).id,
-        travelers: numOfTravelers.valueAsNumber,
-        date: startDate.value.split('-').join('/'),
-        duration: tripDuration.valueAsNumber,
-        status: 'pending',
-        suggestedActivities: [],}
-    fetch('http://localhost:3001/api/v1/trips', {
-        method: 'POST',
-        body: JSON.stringify(newTrip), 
-        headers: {
-            'Content-Type': 'application/json'
-        }
-      })
-      .then(response => {
-        if(!response.ok) {
-          throw new Error("Data failed to post");
-        }
-        resolvePromises(currentUser.id)
-        displayNewTripCost(newTrip)
-        return response.json();
-      })
-}
-
 function evaluateInformation(event){
     event.preventDefault()
     let userIdInput = username.value.split("r")[2]
@@ -92,24 +65,12 @@ function evaluateInformation(event){
       resolvePromises(userId)
       hideLogInPage()
     } else if (userTraveler !== "traveler" && passwordInput !== "travel"){
-      invalidUsernameAndPassword()
+      domUpdates.invalidUsernameAndPassword(wrongInputError)
     } else if (userTraveler !== "traveler" || userId > 50 || !userId){
-      invalidUsername()
+      domUpdates.invalidUsername(wrongInputError)
     } else if (passwordInput !== "travel") {
-      invalidPassword()
+      domUpdates.invalidPassword(wrongInputError)
     }
-}
-
-function invalidUsernameAndPassword(){
-    wrongInputError.innerText = "Invalid username and password"
-}
-  
-function invalidUsername(){
-    wrongInputError.innerText = "Invalid username"
-}
-  
-function invalidPassword(){
-    wrongInputError.innerText = "Invalid password"
 }
 
 function hideLogInPage(){
@@ -123,58 +84,49 @@ function updateDOM(){
     findPastTrips()
     findPendingTrips()
     findUpcomingTrips()
-    displayWelcomeMessage()
-    displayYearCosts()
+    domUpdates.displayWelcomeMessage(currentUser)
+    findYearCosts()
 }
 
 function convertStringToDate(string){
     return Date.parse(string)
 }
 
-function findPastTrips(){
-    const pastTrips = currentUser.userTrips.filter(trip => {
-       return convertStringToDate(trip.date) < convertStringToDate(currentDate) && trip.status === 'approved'
-    }).map(trip => {
+function createTripObject(array){
+    return array.map(trip => {
         return {
             destination: destinations.findById(trip.destinationID).destination,
             image: destinations.findById(trip.destinationID).image,
             alt: destinations.findById(trip.destinationID).alt,
         }
     })
-    showTrips(pastTrips, pastTripSection)
+}
+
+function findPastTrips(){
+    const pastTrips = currentUser.userTrips.filter(trip => {
+       return convertStringToDate(trip.date) < convertStringToDate(currentDate) && trip.status === 'approved'
+    })
+    let newArray = createTripObject(pastTrips)
+    domUpdates.showTrips(newArray, pastTripSection)
 }
 
 function findPendingTrips(){
     const pendingTrips = currentUser.userTrips.filter(trip => {
         return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'pending'
-    }).map(trip => {
-        return {
-            destination: destinations.findById(trip.destinationID).destination,
-            image: destinations.findById(trip.destinationID).image,
-            alt: destinations.findById(trip.destinationID).alt,
-        }
     })
-    showTrips(pendingTrips, pendingTripsSection)
+    let newArray = createTripObject(pendingTrips)
+    domUpdates.showTrips(newArray, pendingTripsSection)
 }
 
 function findUpcomingTrips(){
     const upcomingTrips = currentUser.userTrips.filter(trip => {
         return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'approved'
-    }).map(trip => {
-        return {
-            destination: destinations.findById(trip.destinationID).destination,
-            image: destinations.findById(trip.destinationID).image,
-            alt: destinations.findById(trip.destinationID).alt,
-        }
     })
-    showTrips(upcomingTrips, upcomingTripsSection)
+    let newArray = createTripObject(upcomingTrips)
+    domUpdates.showTrips(newArray, upcomingTripsSection)
 }
 
-function displayWelcomeMessage(){
-    welcomeMessage.innerText = `Welcome ${currentUser.returnFirstName()}!`
-}
-
-function displayYearCosts(){
+function findYearCosts(){
     const lastYear = new Date(new Date(currentDate) - 365 * 24 * 60 * 60 * 1000)
     const lastYearCosts = currentUser.userTrips.filter(trip => {
         return (convertStringToDate(trip.date) < convertStringToDate(currentDate)) && (convertStringToDate(trip.date) > convertStringToDate(lastYear)) && (trip.status === 'approved')
@@ -182,31 +134,13 @@ function displayYearCosts(){
         acc += destinations.calculateCosts(trip.destinationID, trip.travelers, trip.duration)
         return acc
     }, 0)
-    yearsTotalCost.innerText = `Total Spent This Past Year: $${lastYearCosts}`
+    domUpdates.showYearCosts(yearsTotalCost, lastYearCosts)
 }
 
 function addDestinationOptions(){
     destinationOptions.innerHTML += destinations.data.map(destination => {
         return `
         <option>${destination.destination}</option>
-        `
-    })
-}
-
-function displayNewTripCost(newTripInfo){
-    let newTripCost = destinations.calculateCosts(newTripInfo.destinationID, newTripInfo.travelers, newTripInfo.duration)
-    singleTripCost.innerText = `Your new trip to ${destinations.findById(newTripInfo.destinationID).destination} will cost $${newTripCost}.`
-}
-
-
-function showTrips(filteredTrips, tripLocation){
-    tripLocation.innerHTML = " "
-    filteredTrips.forEach(trip => {
-        tripLocation.innerHTML +=  `
-        <div tabindex="0" class="single-trip">
-            <img class="trip-image" src="${trip.image}" alt="${trip.alt || trip.destination}">
-            <p>${trip.destination}</p>
-        </div>
         `
     })
 }
@@ -227,7 +161,7 @@ function saveNewTrip(){
           throw new Error("Data failed to post");
         }
         resolvePromises(currentUser.id)
-        displayNewTripCost(newTrip)
+        domUpdates.displayNewTripCost(newTrip, destinations)
         return response.json();
       })
 }
