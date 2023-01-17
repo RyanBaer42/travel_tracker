@@ -1,10 +1,8 @@
 import './css/styles.css';
 import UserRepository from './UserRepository';
 import Destinations from './Destinations'
-import User from './User';
-
-// An example of how you tell webpack to use an image (also need to link to it in the index.html)
-import './images/turing-logo.png'
+import apiCalls from './apiCalls';
+import domUpdates from './domUpdates';
 
 //Global Variables
 let userRepo;
@@ -30,58 +28,16 @@ const topHeader = document.getElementById('topHeader')
 const tripsSection = document.getElementById('tripsSection')
 const tripForm = document.getElementById('tripForm')
 const loginForm = document.getElementById('loginForm')
-//Event Listeners
-// window.addEventListener('load', function(){
-//     resolvePromises()
-// })
-tripForm.addEventListener('submit', postNewTrip)
+
+tripForm.addEventListener('submit', function(event){
+    event.preventDefault()
+    saveNewTrip()
+})
 loginForm.addEventListener('submit', evaluateInformation)
-
-
-// API Calls GET Requests
-function loadTravelerData(){
-    const travelersURL = 'http://localhost:3001/api/v1/travelers'
-    return fetch(travelersURL)
-    .then((response) => {
-        if (response.ok){
-                return response.json()
-        }
-    })
-    .then((data) => {
-        return data
-    })
-}
-
-function loadDestinationData(){
-    const destinationURL = 'http://localhost:3001/api/v1/destinations'
-    return fetch(destinationURL)
-    .then((response) => {
-        if (response.ok){
-                return response.json()
-        }
-    })
-    .then((data) => {
-        return data
-    })
-}
-
-function loadTripsData(){
-    const tripsURL = 'http://localhost:3001/api/v1/trips'
-    return fetch(tripsURL)
-    .then((response) => {
-        if (response.ok){
-                return response.json()
-        }
-    })
-    .then((data) => {
-        return data
-    })
-}
-
 
 //Promises
 function resolvePromises(userId){
-    Promise.all([loadTravelerData(),loadDestinationData(), loadTripsData()])
+    Promise.all([apiCalls.loadGetData('http://localhost:3001/api/v1/travelers'),apiCalls.loadGetData('http://localhost:3001/api/v1/destinations'), apiCalls.loadGetData('http://localhost:3001/api/v1/trips')])
     .then((values) => {
         userRepo = new UserRepository(values[0].travelers)
         destinations = new Destinations(values[1].destinations)
@@ -99,34 +55,6 @@ function assignUser(userId){
     currentUser.filterTrips(trips)
 }
 
-function postNewTrip(event){
-    event.preventDefault()
-    let newTrip = {
-        id: trips.length + 1,
-        userID: currentUser.id,
-        destinationID: destinations.findByName(destinationOptions.value).id,
-        travelers: numOfTravelers.valueAsNumber,
-        date: startDate.value.split('-').join('/'),
-        duration: tripDuration.valueAsNumber,
-        status: 'pending',
-        suggestedActivities: [],}
-    fetch('http://localhost:3001/api/v1/trips', {
-        method: 'POST',
-        body: JSON.stringify(newTrip), 
-        headers: {
-            'Content-Type': 'application/json'
-        }
-      })
-      .then(response => {
-        if(!response.ok) {
-          throw new Error("Data failed to post");
-        }
-        resolvePromises(currentUser.id)
-        displayNewTripCost(newTrip)
-        return response.json();
-      })
-}
-
 function evaluateInformation(event){
     event.preventDefault()
     let userIdInput = username.value.split("r")[2]
@@ -137,24 +65,12 @@ function evaluateInformation(event){
       resolvePromises(userId)
       hideLogInPage()
     } else if (userTraveler !== "traveler" && passwordInput !== "travel"){
-      invalidUsernameAndPassword()
+      domUpdates.invalidUsernameAndPassword(wrongInputError)
     } else if (userTraveler !== "traveler" || userId > 50 || !userId){
-      invalidUsername()
+      domUpdates.invalidUsername(wrongInputError)
     } else if (passwordInput !== "travel") {
-      invalidPassword()
+      domUpdates.invalidPassword(wrongInputError)
     }
-}
-
-function invalidUsernameAndPassword(){
-    wrongInputError.innerText = "Invalid username and password"
-}
-  
-function invalidUsername(){
-    wrongInputError.innerText = "Invalid username"
-}
-  
-function invalidPassword(){
-    wrongInputError.innerText = "Invalid password"
 }
 
 function hideLogInPage(){
@@ -165,85 +81,52 @@ function hideLogInPage(){
 //DOM 
 
 function updateDOM(){
-    showPastTrips()
-    showPendingTrips()
-    showUpcomingTrips()
-    displayWelcomeMessage()
-    displayYearCosts()
+    findPastTrips()
+    findPendingTrips()
+    findUpcomingTrips()
+    domUpdates.displayWelcomeMessage(currentUser)
+    findYearCosts()
 }
 
 function convertStringToDate(string){
     return Date.parse(string)
 }
 
-function showPastTrips(){
+function createTripObject(array){
+    return array.map(trip => {
+        return {
+            destination: destinations.findById(trip.destinationID).destination,
+            image: destinations.findById(trip.destinationID).image,
+            alt: destinations.findById(trip.destinationID).alt,
+        }
+    })
+}
+
+function findPastTrips(){
     const pastTrips = currentUser.userTrips.filter(trip => {
        return convertStringToDate(trip.date) < convertStringToDate(currentDate) && trip.status === 'approved'
-    }).map(trip => {
-        return {
-            destination: destinations.findById(trip.destinationID).destination,
-            image: destinations.findById(trip.destinationID).image,
-            alt: destinations.findById(trip.destinationID).alt,
-        }
     })
-    pastTripSection.innerHTML = " "
-    pastTrips.forEach(trip => {
-        pastTripSection.innerHTML +=  `
-        <div tabindex="0" class="single-trip">
-            <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
-            <p>${trip.destination}</p>
-        </div>
-        `
-    })
+    let newArray = createTripObject(pastTrips)
+    domUpdates.showTrips(newArray, pastTripSection)
 }
 
-function showPendingTrips(){
+function findPendingTrips(){
     const pendingTrips = currentUser.userTrips.filter(trip => {
         return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'pending'
-    }).map(trip => {
-        return {
-            destination: destinations.findById(trip.destinationID).destination,
-            image: destinations.findById(trip.destinationID).image,
-            alt: destinations.findById(trip.destinationID).alt,
-        }
     })
-    pendingTripsSection.innerHTML = " "
-    pendingTrips.forEach(trip => {
-        pendingTripsSection.innerHTML += `
-        <div tabindex="0" class="single-trip">
-            <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
-            <p>${trip.destination}</p>
-        </div>
-        `
-    })
+    let newArray = createTripObject(pendingTrips)
+    domUpdates.showTrips(newArray, pendingTripsSection)
 }
 
-function showUpcomingTrips(){
+function findUpcomingTrips(){
     const upcomingTrips = currentUser.userTrips.filter(trip => {
         return convertStringToDate(trip.date) > convertStringToDate(currentDate) && trip.status === 'approved'
-    }).map(trip => {
-        return {
-            destination: destinations.findById(trip.destinationID).destination,
-            image: destinations.findById(trip.destinationID).image,
-            alt: destinations.findById(trip.destinationID).alt,
-        }
     })
-    upcomingTripsSection.innerHTML = " "
-    upcomingTrips.forEach(trip => {
-        upcomingTripsSection.innerHTML += `
-        <div tabindex="0" class="single-trip">
-            <img class="trip-image" src="${trip.image}" alt="${trip.alt}">
-            <p>${trip.destination}</p>
-        </div>
-        `
-    })
+    let newArray = createTripObject(upcomingTrips)
+    domUpdates.showTrips(newArray, upcomingTripsSection)
 }
 
-function displayWelcomeMessage(){
-    welcomeMessage.innerText = `Welcome ${currentUser.returnFirstName()}!`
-}
-
-function displayYearCosts(){
+function findYearCosts(){
     const lastYear = new Date(new Date(currentDate) - 365 * 24 * 60 * 60 * 1000)
     const lastYearCosts = currentUser.userTrips.filter(trip => {
         return (convertStringToDate(trip.date) < convertStringToDate(currentDate)) && (convertStringToDate(trip.date) > convertStringToDate(lastYear)) && (trip.status === 'approved')
@@ -251,7 +134,7 @@ function displayYearCosts(){
         acc += destinations.calculateCosts(trip.destinationID, trip.travelers, trip.duration)
         return acc
     }, 0)
-    yearsTotalCost.innerText = `Total Spent This Past Year: $${lastYearCosts}`
+    domUpdates.showYearCosts(yearsTotalCost, lastYearCosts)
 }
 
 function addDestinationOptions(){
@@ -262,7 +145,23 @@ function addDestinationOptions(){
     })
 }
 
-function displayNewTripCost(newTripInfo){
-    let newTripCost = destinations.calculateCosts(newTripInfo.destinationID, newTripInfo.travelers, newTripInfo.duration)
-    singleTripCost.innerText = `Your new trip to ${destinations.findById(newTripInfo.destinationID).destination} will cost $${newTripCost}.`
+function saveNewTrip(){
+    let newTrip = {
+        id: trips.length + 1,
+        userID: currentUser.id,
+        destinationID: destinations.findByName(destinationOptions.value).id,
+        travelers: numOfTravelers.valueAsNumber,
+        date: startDate.value.split('-').join('/'),
+        duration: tripDuration.valueAsNumber,
+        status: 'pending',
+        suggestedActivities: [],}
+    apiCalls.postNewTrip(newTrip)
+    .then(response => {
+        if(!response.ok) {
+          throw new Error("Data failed to post");
+        }
+        resolvePromises(currentUser.id)
+        domUpdates.displayNewTripCost(newTrip, destinations)
+        return response.json();
+      })
 }
