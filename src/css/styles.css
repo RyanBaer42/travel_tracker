@@ -142,3 +142,8 @@ body{
     margin-left: 4px;
 }
 
+.error-message {
+    background-color: aliceblue;
+    border-radius: 5px;
+    padding: 1%;
+}
